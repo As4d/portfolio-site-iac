@@ -1,5 +1,10 @@
 # Portfolio Site Infrastructure as Code (IaC) + Agile Methodologies
 
+## **Terraform Repository**
+
+All Terraform code for this project is available at:  
+[tf-cloud-portfolio-site](https://github.com/As4d/tf-cloud-portfolio-site)
+
 ## **Overview:**
 This project documents the setup of my personal portfolio site on AWS.
 
@@ -176,3 +181,5 @@ As expected, after creating the bucket i should see a 404 error as there is no i
 For now, I plan on uploading my static website content to the S3 bucket manually via the AWS console for development reasons. It will be an [`index.html`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/HostingWebsiteOnS3Setup.html#step5-upload-index-doc) file from the AWS documentation. In the future, the code will be in a GitHub repo and I can use CI/CD to automate the deployment of the static content to the S3 bucket.
 
 ![Working Site](docs/working-simple-html.png)
+
+---
