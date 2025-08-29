@@ -7,17 +7,21 @@ This project documents the setup of my personal portfolio site on AWS.
 
 ## **Key Agile Practices Implemented:**
 
-Epics are large bodies of work that can be broken down into smaller tasks or user stories. They help in organizing and prioritizing work in a project. In this project, I created three main epics to structure the tasks involved in setting up my portfolio site infrastructure.
+**Epics**  
 
-**Epics:**  
-  1. Domain & DNS Setup  
-  2. Terraform Cloud Setup
-  3. S3 Static Website Hosting
-  4. Connect Domain to S3 Bucket
+Epics are large bodies of work that can be broken down into smaller tasks or user stories. They help in organizing and prioritizing work in a project. In this project, I created four main epics to structure the tasks involved in setting up my portfolio site infrastructure
+
+1. Domain & DNS Setup  
+2. Terraform Cloud Setup
+3. S3 Static Website Hosting
+4. Connect Domain to S3 Bucket
 
 ![Epic Example](docs/jira-epic.png)
 
-- **Kanban Board:** Tracked tasks through **To Do → In Progress → Done**.  
+**Kanban Board** 
+
+Tracked tasks through:
+To Do → In Progress → Done.  
 
 ![Jira Board Example](docs/jira-board.png)
 
