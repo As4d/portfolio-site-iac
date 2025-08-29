@@ -85,7 +85,7 @@ As expected, Terraform detected that the VPC was missing and planned to recreate
 
 **Deprecation of Arguments**
 
-On AWS S3, you can enable static website hosting within the bucket properties. You can specify an index document (e.g., index.html) and an error document (e.g., error.html) to handle requests. However, i found that Terraform had actually deprecated this and other arguments within the resource `aws_s3_bucket`. This does not mean i cannot use them, but for future proofing, its better to use the new S3 resources.
+Some arguments in the `aws_s3_bucket` resource have been deprecated in recent versions of the Terraform AWS provider.
 
 ![Terraform S3 Deprecated](docs/terraform-deprecated-arguments.png)
 
@@ -155,7 +155,6 @@ data "aws_iam_policy_document" "grant_public_read_access" {
 
 After committing the code to Terraform Cloud, It automatically queued a plan and I was able to review the changes before applying them.
 
-![Terraform Cloud Git Commit](docs/terraform-cloud-commit.png)
 ![Terraform Cloud S3 Plan](docs/terraform-cloud-s3-plan.png)
 
 A warning appeared for a deprecated attribute, however it was for the `website_endpoint` output which is not a big issue for now as it doesn't affect the bucket creation. I raised an issue on the Terraform AWS provider GitHub repo to fix later.
@@ -172,5 +171,4 @@ As expected, after creating the bucket i should see a 404 error as there is no i
 
 For now, I plan on uploading my static website content to the S3 bucket manually via the AWS console for development reasons. It will be an [`index.html`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/HostingWebsiteOnS3Setup.html#step5-upload-index-doc) file from the AWS documentation. In the future, the code will be in a GitHub repo and I can use CI/CD to automate the deployment of the static content to the S3 bucket.
 
-![Upload Index Document](docs/manual-upload-index.png)
 ![Working Site](docs/working-simple-html.png)
