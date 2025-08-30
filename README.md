@@ -40,7 +40,6 @@ To Do → In Progress → Done.
 **Outcome:** Domain successfully registered and ready for AWS services.  
 
 ![Route 53 Domain](docs/register-domain.png)  
-![Route 53 NS Records](docs/route53-ns.png)
 
 ---
 
@@ -168,15 +167,13 @@ After committing the code to Terraform Cloud, It automatically queued a plan and
 
 A warning appeared for a deprecated attribute, however it was for the `website_endpoint` output which is not a big issue for now as it doesn't affect the bucket creation. I raised an issue on the Terraform AWS provider GitHub repo to fix later.
 
+![GitHub Issue](docs/github-issue.png)
+
 After applying the changes, I verified in the AWS console that the S3 bucket was created successfully. It successfully enabled static website hosting and the bucket policy was attached correctly.
 
 ![Successfull Policy Attachment](docs/correct-policy.png)
 
 **Uploading Static Content**
-
-As expected, after creating the bucket i should see a 404 error as there is no index document yet.
-
-![404 Not Found](docs/404.png)
 
 For now, I plan on uploading my static website content to the S3 bucket manually via the AWS console for development reasons. It will be an [`index.html`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/HostingWebsiteOnS3Setup.html#step5-upload-index-doc) file from the AWS documentation. In the future, the code will be in a GitHub repo and I can use CI/CD to automate the deployment of the static content to the S3 bucket.
 
