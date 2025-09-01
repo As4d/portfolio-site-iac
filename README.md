@@ -180,9 +180,9 @@ For now, I plan on uploading my static website content to the S3 bucket manually
 
 ### 4. Migrate to Amazon CloudFront Distribution
 
-**Task:** Migrate from S3 static website hosting to Amazon CloudFront distribution.
-**Approach:** Create certificate, create distribution, map origin to S3 bucket.
-**Outcome:** Amazon CloudFront distribution configured and ready to serve static website content.
+**Task:** Migrate from S3 static website hosting to Amazon CloudFront distribution.    
+**Approach:** Create certificate, create distribution, map origin to S3 bucket.    
+**Outcome:** Amazon CloudFront distribution configured and ready to serve static website content.    
 
 **Creating a Certificate**
 
@@ -221,9 +221,9 @@ Now only CloudFront can access the S3 bucket and the static website is being ser
 
 ### 5. Front CloudFront with Route53
 
-**Task:** Point domain to CloudFront distribution using Route 53.
-**Approach:** Create alias record in Route 53 pointing to CloudFront distribution.
-**Outcome:** Domain successfully points to CloudFront distribution, serving the static website.
+**Task:** Point domain to CloudFront distribution using Route 53.    
+**Approach:** Create alias record in Route 53 pointing to CloudFront distribution.    
+**Outcome:** Domain successfully points to CloudFront distribution, serving the static website.    
 
 **Adding Alias Record in Route 53**
 
@@ -252,10 +252,10 @@ resource "aws_route53_record" "portfolio_site" {
 
 **Issue Encountered**
 
-`http://asadalikhan.co.uk`
+`http://asadalikhan.co.uk`    
 ![403 Error](docs/403-route53.png)
 
-`https://asadalikhan.co.uk`
+`https://asadalikhan.co.uk`    
 ![SSL Error](docs/ssl-error.png)
 
 To fix this I had to use a better security policy, previously I was using `TLSv1` but I changed it to `TLSv1.3_2025` which is the most up to date, aswell as adding `asadalikhan.co.uk` to the `aliases` block in the CloudFront distribution.
