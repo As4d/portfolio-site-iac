@@ -20,6 +20,7 @@ Epics are large bodies of work that can be broken down into smaller tasks or use
 2. Terraform Cloud Setup
 3. S3 Static Website Hosting Setup
 4. Migrate to Amazon CloudFront Distribution
+5. Front CloudFront with Route53
 
 ![Epic Example](docs/jira-epic.png)
 
@@ -218,3 +219,58 @@ Now only CloudFront can access the S3 bucket and the static website is being ser
 
 ---
 
+### 5. Front CloudFront with Route53
+
+**Task:** Point domain to CloudFront distribution using Route 53.
+**Approach:** Create alias record in Route 53 pointing to CloudFront distribution.
+**Outcome:** Domain successfully points to CloudFront distribution, serving the static website.
+
+**Adding Alias Record in Route 53**
+
+To point my domain to the CloudFront distribution, I created an alias record in Route 53. This record maps my domain name to the CloudFront distribution's domain name.
+
+```[hcl]
+// Hosted zone
+resource "aws_route53_zone" "portfolio_site_hosted_zone" {
+  name = var.portfolio_site_domain_name
+}
+
+// Create record pointing to CloudFront
+resource "aws_route53_record" "portfolio_site" {
+  zone_id = aws_route53_zone.portfolio_site_hosted_zone.zone_id
+  name    = var.portfolio_site_domain_name
+  type    = "A"
+
+  alias {
+    name    = aws_cloudfront_distribution.static_portfolio_site_s3.domain_name
+    zone_id = aws_cloudfront_distribution.static_portfolio_site_s3.hosted_zone_id
+    // CloudFront is a managed service.
+    evaluate_target_health = false
+  }
+}
+```
+
+**Issue Encountered**
+
+`http://asadalikhan.co.uk`
+![403 Error](docs/403-route53.png)
+
+`https://asadalikhan.co.uk`
+![SSL Error](docs/ssl-error.png)
+
+To fix this I had to use a better security policy, previously I was using `TLSv1` but I changed it to `TLSv1.3_2025` which is the most up to date, aswell as adding `asadalikhan.co.uk` to the `aliases` block in the CloudFront distribution.
+
+```[hcl]
+...
+  aliases = [var.portfolio_site_domain_name]
+...
+  viewer_certificate {
+    acm_certificate_arn      = aws_acm_certificate.portfolio_site_cert.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.3_2025"
+  }
+```
+
+**Locking Down on Security**
+
+Accessing the website via the CloudFront domain still works, but I want to force all traffic to go through my custom domain. 
