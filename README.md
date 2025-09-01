@@ -18,8 +18,8 @@ Epics are large bodies of work that can be broken down into smaller tasks or use
 
 1. Domain & DNS Setup  
 2. Terraform Cloud Setup
-3. S3 Static Website Hosting
-4. Connect Domain to S3 Bucket
+3. S3 Static Website Hosting Setup
+4. Migrate to Amazon CloudFront Distribution
 
 ![Epic Example](docs/jira-epic.png)
 
@@ -44,8 +44,8 @@ To Do → In Progress → Done.
 ---
 
 ### 2. Terraform Cloud Setup
-**Task:** Set up Terraform Cloud for managing infrastructure as code.
-**Approach:** Created account, create organization, set up workspace, connected to GitHub repo.
+**Task:** Set up Terraform Cloud for managing infrastructure as code.  
+**Approach:** Created account, create organization, set up workspace, connected to GitHub repo.  
 **Outcome:** Terraform Cloud workspace ready for managing AWS resources.
 
 **Creating Terraform Cloud Account and Organization:**
@@ -87,8 +87,8 @@ As expected, Terraform detected that the VPC was missing and planned to recreate
 ---
 
 ### 3. S3 Static Website Hosting
-**Task:** Set up S3 bucket for static website hosting.
-**Approach:** Create S3 bucket, configured for static website hosting, set permissions.
+**Task:** Set up S3 bucket for static website hosting.   
+**Approach:** Create S3 bucket, configured for static website hosting, set permissions.  
 **Outcome:** S3 bucket configured and ready to host static website content.
 
 **Deprecation of Arguments**
@@ -165,10 +165,6 @@ After committing the code to Terraform Cloud, It automatically queued a plan and
 
 ![Terraform Cloud S3 Plan](docs/terraform-cloud-s3-plan.png)
 
-A warning appeared for a deprecated attribute, however it was for the `website_endpoint` output which is not a big issue for now as it doesn't affect the bucket creation. I raised an issue on the Terraform AWS provider GitHub repo to fix later.
-
-![GitHub Issue](docs/github-issue.png)
-
 After applying the changes, I verified in the AWS console that the S3 bucket was created successfully. It successfully enabled static website hosting and the bucket policy was attached correctly.
 
 ![Successfull Policy Attachment](docs/correct-policy.png)
@@ -180,3 +176,45 @@ For now, I plan on uploading my static website content to the S3 bucket manually
 ![Working Site](docs/working-simple-html.png)
 
 ---
+
+### 4. Migrate to Amazon CloudFront Distribution
+
+**Task:** Migrate from S3 static website hosting to Amazon CloudFront distribution.
+**Approach:** Create certificate, create distribution, map origin to S3 bucket.
+**Outcome:** Amazon CloudFront distribution configured and ready to serve static website content.
+
+**Creating a Certificate**
+
+Certifcates must exist in the `us-east-1` region so that the internal AWS network can access it for CloudFront .
+
+```[HCL]
+resource "aws_acm_certificate" "portfolio_site_cert" {
+  domain_name = var.portfolio_site_domain_name
+  region      = "us-east-1"
+  validation_method = "DNS"
+}
+```
+
+**Creating an Amazon CloudFront Distribution**
+
+When migrating to CloudFront, we dont require S3 bucket website hosting nor do we need to open the bucket for public access. So we remove `aws_s3_bucket_public_access_block` and `aws_s3_bucket_website_configuration`. We also now need to tweak the bucket policy so that only the `cloudfront.amazonaws.com` service can access the bucket. This can be done by adding a `condition` block checking if the `AWS:SourceArn` matches the Arn of the distribution.
+
+![Terraform Cloud CloudFront Plan](docs/terraform-cloud-cloudfront-plan.png)
+
+However when applying the changes, I encoutnered some errors. I opened GitHub issues for every error I encountered. Visit [CloudFront Issues](https://github.com/As4d/tf-cloud-portfolio-site/issues/4) for more information.
+
+![GitHub Issue Certificate](docs/cloudfront-issue.png)
+
+**Key Take Aways**
+
+When I removed the `aws_s3_bucket_website_configuration`, Terraform explicitly disabled static website hosting on my bucket, since it actively manages that configuration. On the other hand, removing the `aws_s3_bucket_public_access_block` resource didn’t automatically revert the setting in AWS - it simply left the old configuration in place because Terraform was no longer managing it. This taught me that disabling vs. “forgetting” resources in Terraform can have very different effects, and it’s important to understand how state management works to avoid unexpected leftovers.
+
+**Succeful Migration**
+
+Now only CloudFront can access the S3 bucket and the static website is being served via CloudFront.
+
+![CloudFront Successfull Migration](docs/cloudfront-migration-success.png)
+![Private Bucket](docs/private-s3.png) 
+
+---
+
