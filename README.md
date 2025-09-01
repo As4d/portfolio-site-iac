@@ -1,16 +1,21 @@
 # Portfolio Site Infrastructure as Code (IaC) + Agile Methodologies
 
-## **Terraform Repository**
+## Introduction
+
+This project documents the end-to-end setup of my personal portfolio site on AWS using Infrastructure as Code. It covers domain registration, DNS management with Route 53, S3 static site hosting, content delivery and security via CloudFront with ACM certificates, and automated provisioning through Terraform Cloud. The project also demonstrates Agile practices such as epics and Kanban tracking to manage and deliver infrastructure tasks effectively.
+
+### Terraform Repository
 
 All Terraform code for this project is available at:  
 [tf-cloud-portfolio-site](https://github.com/As4d/tf-cloud-portfolio-site)
 
-## **Overview:**
-This project documents the setup of my personal portfolio site on AWS.
+#### Architecture Diagram
+
+![Architecture Diagram](docs/portfolio-architecture-diagram.png)
 
 ---
 
-## **Key Agile Practices Implemented:**
+## Key Agile Practices Implemented
 
 **Epics**  
 
@@ -33,7 +38,7 @@ To Do → In Progress → Done.
 
 ---
 
-## **Tasks:**
+## Tasks
 
 ### 1. Buy Domain & Configure Route 53
 **Task:** Register domain and set up hosted zone for DNS management.  
