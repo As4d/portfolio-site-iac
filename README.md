@@ -80,7 +80,7 @@ Successfully applied the plan to create the VPC and saved the state securely in 
 
 ![Terraform Cloud Apply](docs/terraform-cloud-test-apply.png)
 
-**State Management Test:**
+**State Management Test**
 
 I was curious to see how Terrform cloud handles the state file if i were to delete a resoure on the cloud. I deleted the VPC from the AWS console and then ran another plan in Terraform Cloud. 
 
@@ -278,4 +278,41 @@ To fix this I had to use a better security policy, previously I was using `TLSv1
 
 **Locking Down on Security**
 
-Accessing the website via the CloudFront domain still works, but I want to force all traffic to go through my custom domain. 
+Accessing the website via the CloudFront domain still works, but I want to force all traffic to go through my custom domain. I created a Lambda@Edge function to handle this redirection.
+
+```[js]
+function handler(event) {
+  var request = event.request;
+  var host = request.headers["host"].value;
+
+  if (host !== "asadalikhan.co.uk") {
+    return {
+      statusCode: 301,
+      statusDescription: "Moved Permanently",
+      headers: {
+        location: { value: "https://asadalikhan.co.uk" },
+      },
+    };
+  }
+
+  return request;
+}
+```
+
+![CloudFront Redirect](docs/cloudfront-redirection.gif)
+
+I also enforced HTTPS-only at the CloudFront level.
+
+```[hcl]
+  default_cache_behavior {
+    ...
+    viewer_protocol_policy = "redirect-to-https"
+    ...
+  }
+```
+
+---
+
+## Conclusion
+
+This project successfully demonstrates the use of Infrastructure as Code with Terraform Cloud to set up a personal portfolio site on AWS. It covers domain registration, DNS management, S3 static site hosting, CloudFront distribution, and security configurations. Additionally, it showcases Agile practices such as epics and Kanban tracking to manage and deliver infrastructure tasks effectively. The experience gained from this project has enhanced my understanding of cloud infrastructure management and Agile methodologies.
