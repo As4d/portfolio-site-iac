@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This project documents the end-to-end setup of my personal portfolio site on AWS using Infrastructure as Code. It covers domain registration, DNS management with Route 53, S3 static site hosting, content delivery and security via CloudFront with ACM certificates, and automated provisioning through Terraform Cloud. The project also demonstrates Agile practices such as epics and Kanban tracking to manage and deliver infrastructure tasks effectively.
+This project documents the end-to-end setup of my personal portfolio site on AWS using Infrastructure as Code. It covers domain registration, DNS management with Route 53, S3 static site hosting, content delivery and security via CloudFront with ACM certificates, and automated provisioning through Terraform Cloud. A simple Continuous Deployment pipeline was also implemented using GitHub Actions to automatically upload updates to the S3 bucket and invalidate the CloudFront cache on new commits. The project further demonstrates Agile practices such as epics and Kanban tracking to manage and deliver infrastructure tasks effectively.
 
 ### Terraform Repository
 
@@ -26,6 +26,7 @@ Epics are large bodies of work that can be broken down into smaller tasks or use
 3. S3 Static Website Hosting Setup
 4. Migrate to Amazon CloudFront Distribution
 5. Front CloudFront with Route53
+6. Simple Ci/CD Pipeline Setup
 
 ![Epic Example](docs/jira-epic.png)
 
@@ -313,6 +314,62 @@ I also enforced HTTPS-only at the CloudFront level.
 
 ---
 
+### Simple Ci/CD Pipeline Setup
+
+**Task:** Implement a simple CI/CD pipeline to automate deployment of static content to S3 bucket.
+**Approach:** Use GitHub Actions to trigger deployments on code changes.
+**Outcome:** Automated deployment of static content to S3 bucket on code changes.
+
+**Workflow**
+
+A developer merges/pushes code to the prod branch on `portfolio-site` and a GitHub Actions pipeline is triggered. The pipeline pulls the latest website content, uploads it to the S3 bucket using AWS CLI, and invalidates the CloudFront cache to ensure the latest content is served.
+
+**IAM User for GitHub Actions**
+
+A dedicated IAM user `portfolio-site-deploy-user` will be created with least-privilege permissions - them being `s3:PutObject`, `s3:ListBucket`, `s3:DeleteObject` and `cloudfront:CreateInvalidation`.
+
+**Secrets in GitHub**
+
+The IAM user's access key and secret key will be stored as secrets in the GitHub repository settings. These secrets will be referenced in the GitHub Actions workflow to authenticate AWS CLI commands.
+
+![GitHub Secrets](docs/repo-secrets.png)
+
+**Testing AWS CLI Authentication**
+
+![AWS CLI Test](docs/aws-list-bucket-git-test.png)
+
+**Enabling S3 Versioning**
+
+To keep track of changes and allow for easy rollbacks, I enabled versioning on the S3 bucket. I added the following resource to my `s3.tf` file:
+
+```[hcl]
+resource "aws_s3_bucket_versioning" "static_portfolio_site" {
+  bucket = aws_s3_bucket.static_portfolio_site.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+```
+
+**Issues Encountered**
+
+It ended up pulling code from the root of the repository uploading unnecessary files and folders like `README.md` and `.github`. I had to tweak the `aws s3 sync` command to only upload files from a that has all the relevent files `site` folder.
+
+```yaml
+- name: Upload to S3
+  run: aws s3 sync ./site s3://asad-ali-khan-static-portfolio-site --delete
+```
+
+**Final GitHub Actions Workflow Test**
+
+The workflow ran on the same commit hash `8dc2867` as the push to the `prod` branch, indicating that it was triggered by the push event. The workflow completed successfully, with all steps passing without errors.
+
+![Git Push](docs/git-push.png)
+![Workflow Run](docs/workflow-triggered.png)
+![Workflow Success](docs/final-github-actions-workflow-test.gif)
+
+---
+
 ## Conclusion
 
-This project successfully demonstrates the use of Infrastructure as Code with Terraform Cloud to set up a personal portfolio site on AWS. It covers domain registration, DNS management, S3 static site hosting, CloudFront distribution, and security configurations. Additionally, it showcases Agile practices such as epics and Kanban tracking to manage and deliver infrastructure tasks effectively. The experience gained from this project has enhanced my understanding of cloud infrastructure management and Agile methodologies.
+This project successfully demonstrates the use of Infrastructure as Code with Terraform Cloud to set up a personal portfolio site on AWS. It covers domain registration, DNS management, S3 static site hosting, CloudFront distribution, and security configurations. In addition, a GitHub Actions Continuous Deployment pipeline was introduced to automate deployments, ensuring that changes to the site are seamlessly published and propagated through CloudFront. The project also showcases Agile practices such as epics and Kanban tracking to manage and deliver infrastructure tasks effectively. The experience gained from this project has enhanced my understanding of cloud infrastructure management, automation pipelines, and Agile methodologies.
