@@ -26,7 +26,7 @@ Epics are large bodies of work that can be broken down into smaller tasks or use
 3. S3 Static Website Hosting Setup
 4. Migrate to Amazon CloudFront Distribution
 5. Front CloudFront with Route53
-6. Simple Ci/CD Pipeline Setup
+6. Simple CD Pipeline Setup
 
 ![Epic Example](docs/jira-epic.png)
 
@@ -314,7 +314,7 @@ I also enforced HTTPS-only at the CloudFront level.
 
 ---
 
-### Simple Ci/CD Pipeline Setup
+### Simple CD Pipeline Setup
 
 **Task:** Implement a simple CI/CD pipeline to automate deployment of static content to S3 bucket.
 **Approach:** Use GitHub Actions to trigger deployments on code changes.
