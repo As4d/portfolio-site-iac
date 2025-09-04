@@ -316,7 +316,7 @@ I also enforced HTTPS-only at the CloudFront level.
 
 ### Simple CD Pipeline Setup
 
-**Task:** Implement a simple CI/CD pipeline to automate deployment of static content to S3 bucket.    
+**Task:** Implement a simple CD pipeline to automate deployment of static content to S3 bucket.    
 **Approach:** Use GitHub Actions to trigger deployments on code changes.    
 **Outcome:** Automated deployment of static content to S3 bucket on code changes.   
 
